@@ -111,9 +111,20 @@ function getTimeKeys(date: Date) {
 }
 
 export async function GET(request: Request) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
+    return NextResponse.json({
+      success: false,
+      error: 'CRON_SECRET is not configured',
+    }, { status: 503 });
+  }
+
   const authHeader = request.headers.get('authorization');
-  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    console.log('Cron running (no secret verification)');
+  if (authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({
+      success: false,
+      error: 'Unauthorized',
+    }, { status: 401 });
   }
 
   try {

@@ -206,7 +206,7 @@ Required in Vercel/local for APIs that use KV:
 
 Optional:
 
-- `CRON_SECRET` (if used, cron auth header is checked)
+- `CRON_SECRET` (required for `/api/cron` and `/api/reset`)
 
 Local utility scripts:
 
@@ -256,13 +256,13 @@ curl -s 'https://0g-status.vercel.app/api/history?limit=24' | jq
 ### Manual cron trigger
 
 ```bash
-curl -s https://0g-status.vercel.app/api/cron | jq
+curl -s -H "authorization: Bearer $CRON_SECRET" https://0g-status.vercel.app/api/cron | jq
 ```
 
 ### Reset aggregates
 
 ```bash
-curl -s 'https://0g-status.vercel.app/api/reset?confirm=yes' | jq
+curl -s -H "authorization: Bearer $CRON_SECRET" 'https://0g-status.vercel.app/api/reset?confirm=yes' | jq
 ```
 
 ## Operational Runbook
@@ -288,3 +288,4 @@ curl -s 'https://0g-status.vercel.app/api/reset?confirm=yes' | jq
 - This is a live status system, not mock data.
 - Existing lint output may include legacy warnings in utility/API files; production build is the deployment gate used here.
 - If provider contracts/endpoints change, refresh using `list-services.mjs` and update `computeProviders.ts`.
+- `/api/cron` and `/api/reset` are intentionally fail-closed; they return `401` without bearer auth and `503` if `CRON_SECRET` is missing.
