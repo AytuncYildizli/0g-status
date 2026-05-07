@@ -120,8 +120,8 @@ Response:
 Health calculation:
 
 - `healthPercent = online / verified * 100`
-- `verified = total - unknown`
-- unknown states are excluded from denominator
+- `verified = total - unknownCount` (where `unknownCount` = `ssl_error` + `timeout` + `unknown` states)
+- `ssl_error`, `timeout`, and `unknown` states are all excluded from the denominator
 
 ### `GET /api/cron`
 
